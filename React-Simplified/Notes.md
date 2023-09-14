@@ -90,3 +90,150 @@ function App() {
 
  <h1 id="5">Hi</h1>
 ```
+
+# Day 2
+
+## 1. Components
+
+1. Function Component
++ function name must be pascal casing.  
+```jsx
+export function ToDoList(){
+    return(
+        <ul>
+            <li>Todo 1</li>
+            <li>Todo 2</li>
+            <li>Todo 3</li>
+            <li>Todo 4</li>
+        </ul>
+    )
+}
+```
++ use 
+```jsx
+import { ToDoList } from './ToDoList'
+import './App.css'
+import { ToDoListClass } from './ToDoListClass'
+import { NameCLass } from './NameClass'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+   <>
+   <label>ToDoList</label>
+    <ToDoList/> 
+   <ToDoListClass/>
+   <NameCLass/>
+   </>
+
+  )
+}
+
+export default App
+
+```
+
+2. Class Component 
+
+```jsx
+import React from "react";
+
+export class ToDoListClass extends React.Component{
+    render() {
+        return (
+             <ul>
+                <li>To do 1</li>
+                <li>To do 2</li>
+                <li>To do 3</li>
+                <li>To do 4</li>
+                <li>To do 5</li>
+             </ul>
+        );
+    }
+}
+```
+
+3. use of props to pass attributes to component 
++ for function component 
+```jsx
+// props deconstructed 
+export function ToDoList({children,iscomplete}){
+    return(
+        <ul>
+            <label>{children}
+           <input type="checkbox" defaultChecked={iscomplete}/></label>
+        </ul>
+    )
+}
+Or
+export function ToDoList({props}){
+    return(
+        <ul>
+            <label>{props.children}
+           <input type="checkbox" defaultChecked={props.iscomplete}/></label>
+        </ul>
+    )
+}
+```
+
++ for class
+```jsx
+import React from "react";
+
+export class ToDoListClass extends React.Component{
+    render() {
+        return (
+             <label> <input type="checkbox" defaultChecked={this.props.isComplete}/>
+              {this.props.children}</label>
+        );
+    }
+}
+```
+
+4. Declarative vs imperative
+
+```jsx
+export function Declarative({name, age}){
+    return(
+        <h1>{name} <span style={{color:"red"}}>{age}</span></h1>
+    )
+}
+
+
+// imperative
+const name = "suraj";
+const age ="29";
+const h1 = document.createElement("h1");
+
+
+const span = document.createElement("span")
+
+
+span.style.color= "red";
+
+h1.append(span);
+h1.innerText = name;
+span.innerText = age;
+
+```
+
+5. importing non js files in jsx 
++ we can import image, json, css, etc using the import statement 
+```jsx
+import React, { useState } from 'react'
+import'./style.css'
+import user  from './user.json'
+import react from './assets/react.svg'
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+   <label>{JSON.stringify(user)}</label>
+   <img src={react}/>
+   </>
+
+
+  )
+}
+```
