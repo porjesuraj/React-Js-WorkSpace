@@ -237,3 +237,159 @@ function App() {
   )
 }
 ```
+
+## Hooks 
+
+### 1. UseState for Function component
++ use to set the current value /state of variable in jsx
+```jsx
+export function Counter(){
+
+    const [counter, setCounter] = useState(0);
+
+    function handleCounter()
+    {
+        setCounter(currentvalue =>{return currentvalue+1});
+    };
+    return(
+        <>
+        <h2 onClick={handleCounter}>Component Counter {counter}</h2>
+        </>
+    )
+}
+```
++  useState()
++ adding individual useState() for each variable, either setting direct value, or use function to set the value once per component cycle.
++ i.e value is set on page load once, and not on page refresh.
+
++ setVariable, set the value of the variable each time, On click or other event
++ to use current state for set, need to use arrow function and pass current state as parameter
++ else, the useState initial value is use for setVariable each time.
+```jsx
+function App() {
+  const[name, setName] = useState("Suraj")
+  const[age, setAge] = useState(29)
+  const[counter, setCounter] = useState(0)
+
+  function HandleDivClick(){
+    setName(()=> {return "Raj"});
+    setAge((currentAge)=>{return currentAge + 1});
+    setAge(age+1);
+    setCounter((currentCounter)=> currentCounter+1);
+  }
+  return (
+    <>
+    <div onClick={HandleDivClick}>
+    <h1>Hi {name}</h1>
+   <h2> Your is {age}</h2>
+   <h3>Refresh {counter}</h3>
+  
+    </div>
+
+    <Counter/>
+   
+    </>
+   
+  )
+}
+
+export default App
+
+```
+
++ Setting state in one object using the deconstructor 
++ for setState, using the spread operator (...), so only value name after is changed, rest remain same.
+
+```jsx
+ const[person,setPerson] = useState({name:"Sur",age:30});
+  function handlePersonState(){
+    setPerson({...person,name:"SunShine"});
+  }
+  return (
+     
+   <div>
+    <label onClick={handlePersonState}>{person.name} {person.age}</label>
+   </div>
+    
+   
+  )
+}
+
+export default App
+
+```
+
+### 2. UseState in class component
++ to set state in class component
++ need to use constructor to declare the variable and assign a state to them
++ then we need to use this.state to get the variable value 
++ and use this.setState to set the state for varaible
++ setState on changes the value of mentioned variable , rest remain unchanged
++ the constructor is only called once, so our initial state is only set once in component.
+
+
++ following is a class component with state set for counter
+```jsx
+import React from "react";
+
+export class CounterClass extends React.Component{
+
+    constructor(props){
+        super(props)
+
+        this.state={
+            counter:0
+        }
+    }
+
+
+
+    render() {
+
+        const handleCounter = () =>{
+            this.setState(currentstate =>{
+                return {counter : currentstate.counter+1}
+            })
+        }
+        return (
+             <h1 onClick={handleCounter}>Counter value {this.state.counter}</h1>
+        );
+    }
+}
+```
++ following is an AppClass with example of state
+```jsx
+import React from "react"
+import { CounterClass } from "./counter/CounterClass";
+
+  
+ export default class AppClass extends React.Component{
+
+    constructor(props){
+        super(props)
+     this.state ={
+        name: "suraj",
+        age: 29,
+        counter:0
+     }
+    }
+
+    
+
+    render()
+    {
+    const handleCouterClick =() =>
+    {
+        this.setState({counter:this.state.counter + 1})
+    };
+
+        return( <>
+        <label>{this.state.name} {this.state.age}</label>
+        <br/>
+        <button onClick={handleCouterClick}> {this.state.counter}</button>
+
+        <CounterClass/>
+        </>)
+    }
+}
+```
