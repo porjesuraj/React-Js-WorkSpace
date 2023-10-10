@@ -34,6 +34,10 @@ function App() {
    <div>
     <label onClick={handlePersonState}>{person.name} {person.age}</label>
     <CounterClass/>
+    
+    <label>Input</label>
+    <input defaultValue={name} />
+    <input value={name} onChange={e => setName(e.target.value)} />
    </div>
     </>
    
