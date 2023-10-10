@@ -507,3 +507,127 @@ function App() {
   )
 }
 ```
+## Counter Project
+
+++ class 
+```jsx
+import React from "react";
+export class CounterClass extends React.Component{
+
+    constructor(props){
+        super(props)
+        this.state={
+            name:"",
+            age:0
+        }
+    }
+    render() {
+        return (
+             
+            <>
+            <input value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
+            <br/>
+            <button onClick={() => this.setState({age: this.state.age + 1})}>+</button>{this.state.age}
+            <button onClick={() =>{if(this.state.age == 0 ) return; this.setState({age: this.state.age - 1})}}>-</button>
+            
+                 <br/>
+            
+                <label> My Name is {this.state.name} and my age is {this.state.age}</label>   
+                    </>  
+        );
+    }
+}
+```
+
+++ function 
+
+```jsx
+import { useState } from "react"
+
+export function Counter(){
+
+    const [counter, SetCounter]= useState("")
+   const[name,SetName] = useState("")
+   const[age,SetAge] = useState(0)
+
+
+    return(
+        <>
+<input value={name} onChange={(e) => SetName(e.target.value)} />
+<br/>
+<button onClick={() => SetAge((currentAge) => currentAge + 1)}>+</button>{age}
+<button onClick={() =>{if(age == 0 ) return; SetAge((currentAge) => currentAge - 1)}}>-</button>
+
+     <br/>
+
+    <label> My Name is {name} and my age is {age}</label>   
+        </>
+    )
+} 
+```
+
+## Virtual Dom 
+
++ Virtual dom is a javascript interpretion of DOM, that compares the changes, and updates the changes 
++ in function component, the whole function is rerendered
++ in case of class component, the render function is called and rendered
+
+```jsx
+function App() {
+  const [count, setCount] = useState(0)
+const[name, setName] = useState("")
+console.log("Render App")
+  return (
+    <>
+      <input value={name} onChange={(e) => setName(e.target.value)} />
+
+<label> Name = {name}</label>
+ <Child/>
+    </>
+  )
+}
+
+export function Child(){
+
+    const[age,setAge] = useState(0);
+
+    console.log("Render Child")
+
+    return(
+        <>
+        <input value={age} onChange={(e) => setAge(e.target.value)} />
+
+<label>Age: {age}</label>
+        </>
+    )
+}
+```
+
+## Component life cycle
+
++ 3 stages 
+1. Mount
+2. Render/Rerender
++ happens only when there is state change in component
+3. Unmount
++ removes the state and stored values
+```jsx
+function App() {
+  const [count, setCount] = useState(0)
+const[name, setName] = useState("")
+
+const[showHide,setShowHide] = useState(true);
+
+const childComponent =showHide ? <Child/>:null;
+console.log("Render App")
+  return (
+    <>
+
+    <button style={{display:"block", margin:20}} onClick={() =>setShowHide((s) => !s)}>Show/Hide</button>
+
+ {childComponent}
+    </>
+  )
+}
+
+```
