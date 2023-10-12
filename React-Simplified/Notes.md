@@ -631,3 +631,178 @@ console.log("Render App")
 }
 
 ```
+ ## Use Effect hook
+
+ + used to add a side effect on state change to the page 
+ + the effect can be any UI based property
++ syntax for useEffect hook is 
+1. first parameter the method to be called when state changes
+2. second parameter, array of state object, on whose change the effect is called
+3. if second parameter is empty effect is called on component mounting.
+```jsx
+  const handler = () =>{
+    setWidth(window.innerWidth);
+  };
+  useEffect(() =>{ window.addEventListener("resize", handler);
+  console.log("mount")
+  return() =>{
+    window.removeEventListener("resize",handler )
+    console.log("cleanup")
+  }
+},[])
+
+```
++ following are example of useEffect
+```jsx
+function App() {
+  const [count, setCount] = useState(0)
+ 
+  const [name, setName] = useState("")
+
+  const[width,setWidth] = useState(window.innerWidth);
+
+  const handler = () =>{
+    setWidth(window.innerWidth);
+  };
+  // add effect to window
+  useEffect(() =>{ window.addEventListener("resize", handler);
+  console.log("mount")
+  return() =>{
+    window.removeEventListener("resize",handler )
+    console.log("cleanup")
+  }
+},[])
+
+
+  useEffect(() =>{ console.log("Mount")},[])
+
+const handlerName = () =>{
+  console.log("use Effect name " + name);
+}
+// add effect to the document
+  useEffect(() =>{
+    document.addEventListener("click", handlerName);
+    console.log(" add name click")
+    return() =>{
+      document.removeEventListener("click",handlerName);
+      console.log("name cleanup")
+    }
+
+    },[name])
+// reference type name reference changes on each onchange
+  const person = { name}
+
+  useEffect(() => {console.log(person)},[person])
+  return (
+    <>
+    <input value={name} onChange={(e) => setName(e.target.value) } />
+ <br/>
+    <label >{name}</label>
+
+    <br/>
+    <label>{width}</label>
+  
+    </>
+  )
+    
+}
+```
+
+++ Use Effect Exercise
+
+```jsx
+export function Child(props){
+
+    const[name,setName] = useState("")
+    const[age,setAge] = useState(0)
+
+
+    useEffect(() => console.log("Render"))
+    useEffect(() => console.log(`My name is ${name} and age is ${age}`),[name,age])
+    useEffect(() => {console.log("Hi")
+ return () =>{
+    console.log("Bye")
+ }
+},[])
+// set timer for effect, to delay the log and what is being logged
+useEffect(() => {
+    const timeout = setTimeout(() => {
+        console.log(`name is ${name}`)
+    }, 5000);
+
+    return () =>{
+        clearTimeout(timeout);
+    }
+},[name])
+   useEffect(() =>{ document.title = name},[name])
+    return(
+        <>
+        
+        <input value={name} onChange={(e)=>setName(e.target.value)} />
+<br/>
+        <button onClick={() => setAge((current) => current + 1)}>+</button>
+         {age}
+        <button onClick={() => setAge((current)=> current - 1)} >-</button>
+        <br/>
+
+        <label> My name is {name} and age is {age}</label>
+
+
+        </>
+    )
+
+}
+```
+
+## Class Component Lifecycle
++ we have 3 method to access class mount, update and unmount life cycle event
+
+1. componentDidMount()
+2. componentDidUpdate(prevProps,prevState)
+3. componentWillUnmount()
++ following are the examples
+```jsx
+export class ChildClass extends React.Component{
+
+
+    constructor(props){
+        super(props)
+
+        this.state = {
+            name:""
+        }
+
+        this.handleCLick = () =>{
+            console.log(`name is ${this.state.name}`)
+        }
+    }
+
+    componentDidMount(){
+        console.log("Mount")
+    }
+
+    componentWillUnmount(){
+        console.log("Unmount")
+        document.removeEventListener("click",this.handleCLick)
+    }
+
+    componentDidUpdate(prevProps,prevState){
+
+        if(prevState.name != this.state.name){
+            document.removeEventListener("click",this.handleCLick)
+            document.addEventListener("click", this.handleCLick);
+        }
+
+    }
+
+    render(){
+      return  (<>
+        <label>class</label>
+        <input type="text" value={this.state.name} onChange={(e) =>this.setState({name: e.target.value})} />
+
+<label>{this.state.name}</label>
+        </>
+
+    )}
+}
+```
