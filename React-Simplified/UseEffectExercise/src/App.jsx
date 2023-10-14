@@ -8,15 +8,17 @@ function App() {
   const [count, setCount] = useState(0)
  const[showBoolean,setShowBoolean] = useState(true);
 
- const childComponent = showBoolean ? <Child/>:null;
+ const childComponent = showBoolean ? <ChildClass/>:null;
   return (
     <>
-     {/* <button onClick={() => setShowBoolean((c) => !c)}>Show/Hide</button> */}
+  <button onClick={() => setShowBoolean((c) => !c)}>Show/Hide</button> 
      <br/>
-{/* {
+ {
   childComponent
-} */}
-<ChildClass/>
+} 
+{/* <ChildClass/> */}
+
+
     </>
   )
 }

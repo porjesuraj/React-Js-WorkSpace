@@ -754,7 +754,7 @@ useEffect(() => {
 }
 ```
 
-## Class Component Lifecycle
+## Class Component Lifecycle and how to make changes as per state change
 + we have 3 method to access class mount, update and unmount life cycle event
 
 1. componentDidMount()
@@ -805,4 +805,180 @@ export class ChildClass extends React.Component{
 
     )}
 }
+```
+
++ how to make changes like useEffect in class based component
+
+```jsx
+import React from "react"
+
+export class ChildClass extends React.Component{
+
+
+    constructor(props){
+        super(props)
+
+        this.state = {
+            name:"",
+            age:0
+        }
+
+        this.handleCLick = () =>{
+            console.log(`name is ${this.state.name}`)
+        }
+    }
+
+    componentDidMount(){
+        console.log("Mount")
+        console.log("Hi")
+        console.log("Render")
+    }
+
+    componentWillUnmount(){
+        console.log("Unmount")
+        document.removeEventListener("click",this.handleCLick)
+
+        console.log("Bye")
+        if(this.nameTimeout != null) clearTimeout(this.nameTimeout);
+    }
+
+    componentDidUpdate(prevProps,prevState){
+
+        if(prevState.name != this.state.name){
+            document.removeEventListener("click",this.handleCLick)
+            document.addEventListener("click", this.handleCLick);
+
+            document.title = this.state.name;
+
+            if(this.nameTimeout != null) clearTimeout(this.nameTimeout);
+        this.nameTimeout =     setTimeout(() => {
+                console.log("1second delay time is " + this.state.name)
+            }, 1000);
+        }
+
+
+        if(prevState.name != this.state.name || prevState.age != this.state.age)
+        {
+            console.log(` My name is ${this.state.name} and age is ${this.state.age}`)
+        }
+        console.log("Render")
+
+    }
+
+    render(){
+      return  (<>
+        <label>class</label>
+        <input type="text" value={this.state.name} onChange={(e) =>this.setState({name: e.target.value})} />
+
+
+<label>{this.state.name}</label>
+
+<br/>
+        <button onClick={() => this.setState({age: this.state.age + 1})}>+</button>
+         {this.state.age}
+        <button onClick={() => this.setState({age: this.state.age - 1})} >-</button>
+        <br/>
+
+        <label> My name is {this.state.name} and age is {this.state.age}</label>
+        </>
+
+    )}
+}
+```
+
+## Strict Mode
+
++ in main.jsx we register our react app component to html
++ here we use StrictMode, that runs in debug mode run dev mode
++ strict mode, mount and unmount your component, so we are aware if there are any bugs/side effect in application
++ as all useEffect and component function are runned, on mount and unmount, we can pick up issues with component, easily
++ it only runs in dev env, and not in production, so no performance issue arise
+
+```jsx
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+```
+
+## Fetch API
+
++ use fetch api in useEffect to get data from api
++ to avoid running multiple request, use abortcontroller 
++ set state for loading, data and error so user knows what going on 
+
+```jsx
+import { useEffect, useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+
+function App() {
+ //https://jsonplaceholder.typicode.com/users
+
+const[user,setUser] = useState();
+const[error,setError] = useState();
+
+const[loading,setLoading] = useState(true);
+
+const abortController = new AbortController();
+ useEffect(()=>{
+  setError(undefined);
+  setLoading(true);
+
+  fetch("https://jsonplaceholder.typicode.com/users",{signal:abortController.signal}).then(
+    res => 
+   {
+    if(res.status === 200)
+    {
+     return res.json()
+    }
+    else{
+       return Promise.reject(res)
+    }
+  }).then(
+    res => {
+      setUser(res);
+      console.log("user");
+    }
+
+  ).catch(e => {
+  
+    if(e?.name === "AbortError") return;
+    
+    setError(e);
+    console.log("Error" + e);
+  
+  })
+  .finally(() =>{
+    setLoading(false);
+  })
+
+  return(() =>{
+    abortController.abort();
+  })
+ },[])
+
+ let jsx = null;
+ if(loading)
+ {
+jsx = <h1>Loading...</h1>
+ }
+else{
+  jsx = <h1>{JSON.stringify(user)}</h1>
+ }
+
+
+
+  return (
+    <>
+    {jsx}
+    </>
+  )
+}
+
+export default App
+
 ```
