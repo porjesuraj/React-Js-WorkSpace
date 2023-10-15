@@ -982,3 +982,216 @@ else{
 export default App
 
 ```
+
+## Conditional rendering 
+
++ our UI can be rendered based on the state value , in following ways
+
++ App
+```jsx
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <>
+    <FunctionComponent age={19} />
+    </>
+  )
+}
+```
++ func comp
+```jsx
+import { useState } from "react";
+
+export default function FunctionComponent({age}){
+
+    const[favorate,setfavorate] = useState(0);
+  let jsx;
+    if(age != null)
+    {
+        jsx = `Age is ${age}`
+    }
+
+    return(
+        <>
+        <h1>{age > 0 && age > 18 && `Person is adult`}  </h1>
+
+        {age != null && age>0 ? <h1>age is{age} </h1>: <h2>please enter valid age</h2>}
+        <br/>
+        {jsx}
+        </>
+    )
+}
+
+```
+
++ Looping items in react
+
+```jsx
+function App() {
+  const [count, setCount] = useState(0)
+
+  const[items,setItems] = useState([
+    {id:crypto.randomUUID(),name: "Item1"},
+    {id:crypto.randomUUID(),name: "Item2"}
+  ])
+
+  function handleClick(){
+    setItems((current) =>{
+      return [{id:crypto.randomUUID(),name:"New Item"},...current]
+    })
+  }
+  return (
+    <>
+
+    <button onClick={handleClick} >Add Item</button>
+    <br/>
+
+{
+  //JSON.stringify(items)
+  items.map((item) =>{
+ return <Items key={item.id} item={item}/>
+  })
+}
+    </>
+  )
+}
+
+function Items({item}){
+
+  return ( 
+  <div>
+  <label>{item.name}</label>
+  <input />
+  <br/>
+</div>)
+}
+export default App
+
+```    
+
+### React Fragments
+ + this  are empty container we add when we dont want to add div to a component
+```jsx
+<>
+<input/>
+<button/>
+</>
+```
++ we can use fragment when creating list, there we need to define the key, and that can be done by
+```jsx
+{
+items.map((item) =>{
+<React.Fragment key={item.id}>
+  <label>{item.name}</label>
+  <input />
+  <br/>
+</React.Fragment>
+ });
+}
+```
+
+## User List Project
++ fetch users from api and add to list with loading screen
+```jsx
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import { useEffect } from 'react'
+import { Fragment } from 'react'
+
+function App() {
+
+const[users,setUsers] = useState([]);
+const[error,setError] = useState("");
+const[loading,setLoading] = useState(true);
+
+const controller = new AbortController();
+useEffect(() =>{
+setLoading(true);  
+fetch("https://jsonplaceholder.typicode.com/users",{signal:controller.signal,}).
+then((res) =>{
+  if(res.status === 200){
+    return res.json()
+  }else{
+    Promise.reject(res);
+  }
+}).
+then( setUsers).catch((e) => {
+  if(e?.name === "AbortError") return;
+  setError("Error")
+}).finally(() =>{
+  setLoading(false)
+})
+
+return(() =>{
+ // controller.abort();
+})},[]);
+
+
+return (
+    <> 
+      <h1>User List</h1>
+
+<ul>{loading ? <h2>Loading ...</h2> : users != null ? 
+(users.map((user) =>{   
+return <Users key={user.id} user={user}/>
+})
+)
+:"Error"}</ul>
+    
+    </>
+  )
+}
+
+function Users({user}){
+  return(
+       
+    <>
+    <li>{user.name} <br/></li>
+
+    </>
+  )
+}
+export default App
+
+```
+
+## Spread Operator in props 
+
++ we can use ... to get all values in object, in props . 
++ i.e we can deconstruct the object using spread operator
+```jsx
+return (
+    <> 
+ <Users key={user.id} {...user}/>
+    </>
+  )
+}
+
+
+function Users({name, email}){
+  return(     
+    <>
+    <li>{name}  {email} </li>
+    
+    </>
+  )
+}
+```
+
+## Render Raw HTML
++ if we need to pass html in component can use dangerouslySetInnerHTML to pass custom html
++ but it exposes the web page to cross site scripting attack.
++ i.e adding srcipt to our inner html , so never pass input in custom html
+```jsx
+const CustomHTML = `
+<h1> Cross Site Script Attack!!!</h1>
+`
+
+return(
+  <div dangerouslySetInnerHTML={{__html:CustomHTML }}>
+      </div>
+)
+```
