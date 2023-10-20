@@ -1195,3 +1195,319 @@ return(
       </div>
 )
 ```
+
+## Todo List Project
++ includes how to created component and pass function as props 
+
+```jsx
+import TodoItemList from './TodoItemList'
+
+function App() {
+  const[itemList,setItemList] = useState([]);
+  const[input,setInput] = useState("");
+  function handleAddClick(){
+    if(input !== ""){
+
+      setItemList((current) => [...current,{id:crypto.randomUUID(),name:input,completed:false}]);
+      console.log(itemList);
+    }
+  else{
+    alert("please enter valid input")
+     }
+    }
+
+    function handleDeleteClick(itemKey){
+
+      setItemList((current) => {
+       return current.filter(todo => todo.id !== itemKey);
+      })
+    }
+
+    function toggleCheckbox(itemId,completed) {
+
+      setItemList(current =>{
+return current.map((todo) =>{
+  if(todo.id === itemId)
+  {
+    return {...todo,completed};
+  }
+  else{
+    return todo;
+  }
+});
+       
+      })
+    }
+  return (
+    <>
+     <ul id="list">
+     {
+       itemList != null ? itemList.map((item) => {
+       
+     return  <TodoItemList {...item} key={item.id} toggleCheckbox={toggleCheckbox} handleDeleteClick={handleDeleteClick}/>
+    
+       }): null
+     }  </ul>
+     
+
+    <div id="new-todo-form">
+      <label htmlFor="todo-input">New Todo</label>
+      <input type="text" id="todo-input" defaultValue={input} onChange={(e) => setInput(e.target.value) } />
+      <button onClick={handleAddClick}>Add Todo</button>
+    </div>
+    </>
+  )
+}
+
+export default App
+
+```
+
++ Todo component
+```jsx
+export default function TodoItemList({id,name,completed,toggleCheckbox, handleDeleteClick}){
+
+    return(
+        <li className="list-item">
+        <label className="list-item-label" >
+          <input type="checkbox" data-list-item-checkbox checked={completed} onChange={(e) => toggleCheckbox(id,e.target.checked)}  />
+          <span data-list-item-text>{name}</span>
+        </label>
+        <button data-button-delete onClick={() => handleDeleteClick(id)}>Delete </button>
+      </li>
+    )
+}
+```
+
+## Hook Rules
+
+1. Hooks cannot be called conditionally and outside body of  function component
+```jsx
+function App(){
+
+  const[count,setCount] =useState()
+//1. Get Error
+  if(count > 5){
+    useEffecr(() =>{
+
+    })
+  }
+  //2. after hook
+   if(count > 5) return "hi"
+
+   return(<>
+   </>)
+}
+
+```
+2. conditional render must be after hook
+3. hooks can be called in body of function component and custom hooks.
+
+
+
+### 1. useRef Hook in function comp
+
++ useRef usecase
+1.  used to store data, between render, that does not cause the component to re render, when it changes 
+```jsx
+function App(){
+
+  const nameRef = useRef("Suraj");
+  console.log(nameRef.current);
+  nameRef.current = "Raj";
+}
+```
+2. useRef can be used  to get reference for html, as every html tag have a ref attribute 
+```jsx
+function App(){
+  const inputRef = useRef();
+
+useEffect(() =>{
+  inputRef.current.focus()
+},[]);
+
+  return(<>
+  <input ref={inputRef} >
+  </>)
+}
+
+```
+### 2. useRef in class comp
+
+1. in class, if we want to set a property and not want it to rerender the component, need to set the property on class this value
+2. to useRef in class component
+```jsx
+class App extends React.Component{
+
+constructor(props){
+  super(props);
+
+  this.valueToSet = 7
+  //2. useRef in class
+  this.inputRef = React.createRef();
+}
+
+componentDidMount(){
+  this.inputRef.current.focus()
+}
+
+
+render(){
+//1. no re render happens for this.
+ return(
+  <>
+  {this.valueToSet = 8}
+   return(<>
+  <input ref={inputRef} >
+  </>)
+  </>
+
+ ) 
+}
+
+}
+```
+
+### 2. useMemo 
++ this hook is specifically for performance gain, here we set a property, on whose change, we perform a  memory intensive task.
++ it is same as useEffect but for performance gain.
++ if web response has slowed down, then we can use this hook.
+```jsx
+import { useEffect, useMemo, useRef, useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+
+const LIST = Array(1_000_000).fill()
+.map((_,i) => i+1);
+function App() {
+  const [count, setCount] = useState(0)
+  const[query,setQuery] = useState("");
+  const[isDarkMode,setIsDarkMode] = useState(false);
+
+  const inputRef = useRef();
+    useEffect(() =>{
+ //   inputRef.current.focus();
+  })
+
+  const filteredList = useMemo(() =>{
+   return LIST.filter(n => n.toString().includes(query));
+  },[query])
+  
+
+  console.log(filteredList.length)
+
+
+  function inputChange(value){
+    setCount(value);
+     console.log(inputRef.current)
+  }
+  return (
+    <>
+<div style={{
+  background:isDarkMode?"#333" :"White",
+  color:isDarkMode ? "White":"#333",
+
+}}>
+
+<label>Query:
+<br/>
+  <input value={query} onChange={e => setQuery(e.target.value)}/>
+</label>
+<br/>
+ <input ref={inputRef} value={count}  onChange={(e) =>inputChange(e.target.value) } />
+<br/>
+ <label>
+
+  <input type='checkbox' checked={isDarkMode} onChange={(e) => setIsDarkMode(e.target.checked)} />
+  Dark Mode
+ </label>
+ <br/>
+</div>
+
+   
+    </>
+  )
+}
+
+export default App
+
+```
+### 3. useCallback 
+
++ use to memorized the function
++ so only when function changes due to state change, effect is called
++ as using a function directly in component, leads to function being rendered each time component renders.
+```jsx
+const printName = useCallback(() =>{
+    console.log(isDarkMode);
+  },[isDarkMode])
+
+  useEffect(() =>{
+    printName();
+  },[printName])
+```
+
+## Custom Hook
+
+1. We can set custom hooks, as function containing avaliable hooks, to generalize a process, like setting input value , toggle a value
+
+2. Set Input value hook and toggle value hook
+3. best practice to define hook in separate file.
+```jsx
+function App() {
+
+// custom hook for setting input value
+ // const [name,setName] = useState("");
+ const nameInput = setInputValue("");
+
+ //custom hook for toggle 
+  const[isDarkMode,toggleDarkMode] = useToggle(false);
+  //useState(false);
+
+  return (
+    <>
+    <div style={{
+      background: isDarkMode ? "#333": "White",
+      color: isDarkMode ?"white":"black"
+    }}>
+<label> Name :</label>
+<br/>
+   {/* <input value={name} onChange={(e) => setName(e.target.value)} /> */}
+      <input {...nameInput} />
+        <br/>
+        {/* <input type='checkbox' checked={isDarkMode} onChange={(e) => setIsDarkMode(e.target.checked)} /> */}
+      <br/>
+      <button  onClick={toggleDarkMode} style={{background:"Grey",display:'-ms-flexbox',}}>Toggle Darkmode</button>
+      <br/>
+
+    </div>
+     
+    </>
+  )
+//custom hook 
+function setInputValue(initalValue){
+
+    const[value,setValue] = useState(initalValue);
+
+
+    return{value, onChange : (e) =>{setValue(e.target.value); console.log(value)} }
+  }
+
+  
+}
+//custom hook
+function useToggle(initialValue){
+
+    const[value,setValue] = useState(initialValue);
+
+    function toggle(){
+      setValue(current => !current)
+    }
+
+    return[value,toggle]
+  }
+
+export default App
+
+```
