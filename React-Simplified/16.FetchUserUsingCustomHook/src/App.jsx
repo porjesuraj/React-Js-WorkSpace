@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useEffect } from 'react'
+import { useFetch } from './useFetch'
 
 // If the API does not work use these local URLs
 // const URLS = {
@@ -27,9 +28,9 @@ const URLS = {
  }
 
 function App() {
-  const [url, setUrl] = useState(URLS.USERS,OPTIONS)
+  const [url, setUrl] = useState(URLS.USERS)
 
-  const {data, isLoading, isError} = useFetch(url)
+  const {data, isLoading, isError} = useFetch(url,OPTIONS)
   // BONUS:
   // const { data, isLoading, isError } = useFetch(url, OPTIONS)
 
@@ -71,41 +72,6 @@ function App() {
     </>
   )
 
-
-  function useFetch(url,options={}) {
-
-    const[data,setData] = useState([]);
-    const[isLoading,setIsLoading] = useState(true);
-    const[isError,setIsError] = useState(false); 
-
-    useEffect(() =>{
-
-      setData([]);
-      setIsError(false);
-      setIsLoading(true);
-
-      const controller = new AbortController();
-      fetch(url,{signal:controller.signal,...options}).then(res =>{
-        if(res.status === 200){
-          return res.json()
-        }else{
-         Promise.reject(res);
-        }
-      }).then(setData).catch((e) => {
-        if(e?.name === "AbortError") return;
-        console.log(e); setIsError(true)}).
-      finally(() => {setIsLoading(false);
-        console.log(data);
-      
-      })
-      
-      return(() =>{
-        controller.abort();
-      })
-  }    ,[url])
-
-  return {data,isLoading,isError}
-  }
 }
 export default App
 
