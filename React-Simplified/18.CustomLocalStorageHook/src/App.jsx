@@ -1,35 +1,76 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { useLocalStorage } from './useLocalStorageHook'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [firstName, setFirstName] = useLocalStorage("FIRST_NAME", "")
+
+  // Bonus:
+   const [lastName, setLastName] = useLocalStorage("LAST_NAME", () => {
+     return "Default"
+   })
+
+  // Bonus:
+   const [hobbies, setHobbies] = useLocalStorage("HOBBIES", [
+     "Programming",
+    "Weight Lifting",
+  ])
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          marginBottom: "1rem",
+        }}
+      >
+        <label>First Name</label>
+        <input
+          type="text"
+          value={firstName}
+          onChange={e => setFirstName(e.target.value)}
+        />
+        <br/>
+        {firstName}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          marginBottom: "1rem",
+        }}
+      >
+        <label>Last Name</label>
+        <input
+          type="text"
+          value={lastName}
+          onChange={e => setLastName(e.target.value)}
+        />
+        <br/>
+        {lastName}
+      </div> 
+
+      
+       <div>{hobbies.join(",")}</div>
+      <button
+        onClick={() =>
+          setHobbies(currentHobbies => [...currentHobbies, "New Hobby"])
+        }
+      >
+        Add Hobby
+      </button> 
     </>
   )
+
+ 
 }
 
 export default App
+

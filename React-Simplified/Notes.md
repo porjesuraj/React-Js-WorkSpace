@@ -1626,3 +1626,196 @@ export default App
 
 ## 2. Array Custom Hook
 
++ custom hook class
+```jsx
+import { useCallback, useState } from "react"
+
+export default function useArray(init){
+    const[array,setArray] = useState(init)
+  
+    const set = useCallback((selectedArray  = []) => {
+      
+        setArray(current => {
+          return selectedArray
+        })
+      },[]);
+    const push = useCallback((selectedNumber) => {
+        setArray((current) => [...current,selectedNumber])
+      },[]);
+  
+    const replace = useCallback((index,value) => {
+        setArray(current =>{
+        // return current.map((_,i) =>{
+        //   if(i === index){
+        //     return value;
+        //   }
+        //   return _; })
+        return[...current.slice(0,index),value,...current.slice(index+1)];
+    
+    })
+      },[])
+  
+    const filter = useCallback((value) =>{
+  
+        setArray(current => current.filter(v => v < value))
+       },[])
+  
+    const remove = useCallback((index) =>{
+  
+        setArray(current => [...current.slice(0,index),...current.slice(index+1)])
+      },[])
+  
+    const clear = useCallback(() =>{
+        setArray([])
+      },[])
+  
+    const reset = useCallback((init)=>{
+        setArray(init);
+      },[])
+  
+    return{array,set,push,replace,filter,remove,clear,reset}
+  }
+```
+
++ App class
+```jsx
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import useArray from './useArrayHook'
+
+const INITIAL_ARRAY=[1,2,3]
+function App() {
+  const{array,set,push,replace,filter,remove,clear, reset} = useArray(INITIAL_ARRAY);
+
+  return (
+    <>
+
+     <h2>{array.join(",")}</h2>
+     <br/>
+      <button onClick={() => set([4,5,6])}>Set to [4,5,6]</button>
+      <br/>
+      <button onClick={() => push(4)}>Push 4</button>
+      <br/>
+      <button onClick={() => replace(1,9)}>Replace the second element with 9</button>
+      <br/>
+      <button onClick={() => filter(3)}>Keep number less than 3</button>
+      <br/>
+      <button onClick={() => remove(1)}>Remove second element</button>
+      <br/>
+      <button onClick={() => clear()}> clear</button>
+      <br/>
+      <button onClick={() => reset(INITIAL_ARRAY)} > reset</button>
+
+
+    </>
+  )
+
+}
+
+export default App
+
+```
+## 3. use Local storage Hook
+
+```jsx
+import { useEffect, useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+
+function App() {
+  const [firstName, setFirstName] = useLocalStorage("FIRST_NAME", "")
+
+  // Bonus:
+   const [lastName, setLastName] = useLocalStorage("LAST_NAME", () => {
+     return "Default"
+   })
+
+  // Bonus:
+   const [hobbies, setHobbies] = useLocalStorage("HOBBIES", [
+     "Programming",
+    "Weight Lifting",
+  ])
+
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          marginBottom: "1rem",
+        }}
+      >
+        <label>First Name</label>
+        <input
+          type="text"
+          value={firstName}
+          onChange={e => setFirstName(e.target.value)}
+        />
+        <br/>
+        {firstName}
+      </div>
+
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          marginBottom: "1rem",
+        }}
+      >
+        <label>Last Name</label>
+        <input
+          type="text"
+          value={lastName}
+          onChange={e => setLastName(e.target.value)}
+        />
+        <br/>
+        {lastName}
+      </div> 
+
+      
+       <div>{hobbies.join(",")}</div>
+      <button
+        onClick={() =>
+          setHobbies(currentHobbies => [...currentHobbies, "New Hobby"])
+        }
+      >
+        Add Hobby
+      </button> 
+    </>
+  )
+
+  function useLocalStorage(key,initialValue ){
+
+    const[value,setValue] = useState(() =>{
+      const localValue = localStorage.getItem(key);
+      if(localValue == null){
+        if(typeof(initialValue) === "function" )
+        return initialValue()
+        else 
+
+        return initialValue;
+      } else
+          return JSON.parse(localValue);
+    });
+
+     useEffect(() =>{
+      if(value == undefined)
+        localStorage.removeItem(key)
+       localStorage.setItem(key,JSON.stringify(value))
+     },[value])
+
+    
+    return [value,setValue ]
+  }
+}
+
+export default App
+
+
+```
