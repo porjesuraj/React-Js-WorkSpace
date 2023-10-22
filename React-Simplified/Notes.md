@@ -1819,3 +1819,106 @@ export default App
 
 
 ```
+
+## Adding forms in react
+
+```jsx
+
+function handleAddClick(e){
+   //prevent page refresh on form submit
+   e.preventDefault()
+    }
+return(
+  <>
+<form onSubmit={handleAddClick} id="new-todo-form">
+      <label htmlFor="todo-input">New Todo</label>
+      <input type="text" id="todo-input" defaultValue={input} onChange={(e) => setInput(e.target.value) } />
+      <button>Add Todo</button>
+      <textarea defaultValue="test"></textarea>
+      <select defaultValue="3">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </form>
+    </>
+)
+```
+
+## React One way dataflow
+
+1. in react, data/states always flow from parent to child component
+2. so if we want our child component to change state, we need to pass a function to the parent, that can make the change happen.
+3. for example in case of todolist, we want to toggle and delete todo, so here we have
+
+```jsx
+//passing toggle and delete as function to be used by App
+export default function TodoItemList({id,name,completed,toggleCheckbox, handleDeleteClick}){
+
+    return(
+        <li className="list-item">
+        <label className="list-item-label" >
+          <input type="checkbox" data-list-item-checkbox checked={completed} onChange={(e) => toggleCheckbox(id,e.target.checked)}  />
+          <span data-list-item-text>{name}</span>
+        </label>
+        <button data-button-delete onClick={() => handleDeleteClick(id)}>Delete </button>
+      </li>
+    )
+}
+
+App
+
+return  (<TodoItemList {...item} key={item.id} toggleCheckbox={toggleCheckbox} handleDeleteClick={handleDeleteClick}/>)
+
+```
+
+4. Using useRef instead of useState help, in case 
++ we want the reference value, and not interested in onChange, of value for forms
+
+```jsx
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import { useEffect } from 'react';
+import { useRef } from 'react';
+
+function App() {
+  //const[name, setName] = useState("");
+const nameRef = useRef();
+useEffect(() =>{
+  console.log("Render")
+})
+
+function handleFormSubmit(e){
+
+  const name = nameRef.current.value;
+  e.preventDefault();
+
+  if(name === "")
+  {
+
+  }else
+  {
+    alert(name);
+  }
+}
+
+  return (
+  <>
+  <form onSubmit={handleFormSubmit}>
+    <label htmlFor='input'>Name</label>
+    {/* <input value={name} onChange={(e) => setName(e.target.value)}/> */}
+    <input id="input" ref={nameRef} />
+    <br/>
+    <br/>
+    <button>Alert Button</button>
+  </form>
+  </>
+  
+  )
+}
+
+export default App
+
+```

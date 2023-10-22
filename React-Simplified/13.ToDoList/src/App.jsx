@@ -11,7 +11,9 @@ function App() {
   const nameRef = useRef("Suraj");
   console.log(nameRef.current);
   nameRef.current = "Raj";
-  function handleAddClick(){
+  function handleAddClick(e){
+    e.preventDefault()
+
     if(input !== ""){
 
       setItemList((current) => [...current,{id:crypto.randomUUID(),name:input,completed:false}]);
@@ -56,11 +58,17 @@ return current.map((todo) =>{
      }  </ul>
      
 
-    <div id="new-todo-form">
+    <form onSubmit={handleAddClick} id="new-todo-form">
       <label htmlFor="todo-input">New Todo</label>
       <input type="text" id="todo-input" defaultValue={input} onChange={(e) => setInput(e.target.value) } />
-      <button onClick={handleAddClick}>Add Todo</button>
-    </div>
+      <button>Add Todo</button>
+      <textarea defaultValue="test"></textarea>
+      <select defaultValue="3">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </form>
     </>
   )
 }
