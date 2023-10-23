@@ -1922,3 +1922,163 @@ function handleFormSubmit(e){
 export default App
 
 ```
+
+## Form Validation Project
++ create login page with validation to input email and password on submit button and on text change
++ validation 
+
+```jsx
+
+export function checkEmail(email){
+
+const error = [];
+
+if( email === "") 
+{
+    error.push("Required \n")
+}else if(!email.endsWith("@gmail.com"))
+{
+    error.push("Email must end with @gmail.com \n")
+}
+    return error;
+}
+
+export function checkPassword(password){
+
+    const error = [];
+    if(password.length < 10){
+        error.push("Password must be atleast 10 character \n")
+    }else if(!password.match(/[A-Z]/)){
+        error.push("must have atleast 1 Upper case letter \n")
+    }else if(!password.match(/[a-z]/)){
+        error.push("must have atleast 1 Lower case letter \n")
+    }else if(!password.match(/[0-9]/)){
+        error.push("must have atleast 1 number \n")
+    }
+
+    return error;
+}
+
+```
++ using useRef
+```jsx
+import { useRef, useState } from "react";
+import { checkEmail, checkPassword } from "./validators";
+
+function RefForm() {
+    const email = useRef();
+    const [emailErrorMessage, setemailErrorMessage ]= useState("");
+    const password = useRef();
+    const [passwordErrorMessage,setPasswordErrorMessage] = useState("")
+    const[isFirstSubmitDone,setisFirstSubmitDone] = useState(false);
+    
+  function handleSubmit(e){
+    e.preventDefault();
+  
+    setisFirstSubmitDone(true);
+    const emailErrors = checkEmail(email.current.value);
+  
+    const passwordErrors = checkPassword(password.current.value);
+  
+    setemailErrorMessage(emailErrors);
+    setPasswordErrorMessage(passwordErrors);
+  
+    if(emailErrors.length === 0 && passwordErrors.length === 0){
+      alert("Success")
+    }
+  }
+    return (
+    <>
+      <form className="form" onSubmit={handleSubmit}>
+        <div className={`form-group ${emailErrorMessage.length > 0 ? "error":""}`}>
+          <label className="label" htmlFor="email">Email</label>
+          <input className="input" type="email" id="email"  ref={email}
+          onChange={(e)=> isFirstSubmitDone? setemailErrorMessage(checkEmail(e.target.value)): undefined}
+          />
+          <div className="msg" >{ emailErrorMessage !== ""? emailErrorMessage:null }</div>
+        </div>
+         <div className={`form-group ${passwordErrorMessage.length>0 ? "error":""}`}>
+          <label className="label" htmlFor="password">Password</label>
+          <input
+  
+            className="input"
+            ref={password}
+            type="password"
+            id="password"
+            onChange={(e) => isFirstSubmitDone? setPasswordErrorMessage(checkPassword(e.target.value)):undefined}
+          />
+          <div className='msg'>{passwordErrorMessage !== ""? passwordErrorMessage:null}</div>
+        </div> 
+        <button className="btn" type="submit">Submit</button>
+      </form>
+    </>
+    )
+  }
+  
+  export default RefForm
+  
+```
++ using useState
+```jsx
+import { useMemo, useRef, useState } from "react";
+import { checkEmail, checkPassword } from "./validators";
+
+function StateForm() {
+    const [email,setEmail] = useState("");
+    //const [emailErrorMessage, setemailErrorMessage ]= useState("");
+    const [password,setPassword] = useState("");
+   // const [passwordErrorMessage,setPasswordErrorMessage] = useState("")
+    
+    const[isFirstSubmitDone,setisFirstSubmitDone] = useState(false);
+
+    //usememo for performance
+    const emailErrorMessage = useMemo(() =>{
+       return isFirstSubmitDone? checkEmail(email):[];
+    },[isFirstSubmitDone,email]); 
+
+    const passwordErrorMessage = useMemo(() =>{
+        return  isFirstSubmitDone ? checkPassword(password):[];
+    },[isFirstSubmitDone,password]);
+  function handleSubmit(e){
+    e.preventDefault();
+  setisFirstSubmitDone(true);
+    const emailErrors = checkEmail(email);
+  
+    const passwordErrors = checkPassword(password);
+  
+   // setemailErrorMessage(emailErrors);
+   // setPasswordErrorMessage(passwordErrors);
+  
+    if(emailErrors.length === 0 && passwordErrors.length === 0){
+      alert("Success")
+    }
+  }
+    return (
+    <>
+      <form className="form" onSubmit={handleSubmit}>
+        <div className={`form-group ${emailErrorMessage.length > 0 ? "error":""}`}>
+          <label className="label" htmlFor="email">Email</label>
+          <input className="input" type="email" id="email"  value={email} onChange={(e) => setEmail(e.target.value)}/>
+          <div className="msg" >{ emailErrorMessage !== ""? emailErrorMessage:null }</div>
+        </div>
+         <div className={`form-group ${passwordErrorMessage.length>0 ? "error":""}`}>
+          <label className="label" htmlFor="password">Password</label>
+          <input
+  
+            className="input"
+            value={password}
+            type="password"
+            id="password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div className='msg'>{passwordErrorMessage !== ""? passwordErrorMessage:null}</div>
+        </div> 
+        <button className="btn" type="submit">Submit</button>
+      </form>
+    </>
+    )
+  }
+  
+  export default StateForm
+  
+```
