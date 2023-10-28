@@ -2217,3 +2217,132 @@ console.log(country)
 export default App
 
 ```
+
+## useReducer hook 
++ we can use it, when we have defined action, that can be repetative 
+
+```jsx
+import { useReducer, useState } from "react"
+
+const ACTIONS = {
+    DECREMENT:"DECREMENT",
+    INCREMENT:"INCREMENT",
+    RESET:"RESET",
+    CHANGE_COUNTER:"CHANGE_COUNTER"
+
+}
+function reducer(state,action){
+
+    switch(action.type){
+        case ACTIONS.DECREMENT:
+            return state - 1;
+        case ACTIONS.INCREMENT:
+            return state + 1;
+        case ACTIONS.RESET:
+            return 0;
+        case ACTIONS.CHANGE_COUNTER:
+            return state + action.payload.value;       
+        default:
+            return state;
+    }
+}
+export function Counter({initialCount = 0}){
+
+   // const[counter,setCounter] = useState(initialCount);
+    const[counter,dispatch] = useReducer(reducer,initialCount);
+
+
+    return(
+        <>
+        {/* <button onClick={() => setCounter(current => current - 1)}>-</button> */}
+        <button onClick={() => dispatch({type:ACTIONS.DECREMENT})}>-</button>
+        {counter}
+        <button onClick={() => dispatch({type:ACTIONS.INCREMENT})}>+</button>
+        {/* <button onClick={() => setCounter(current => current + 1)}>+</button> */}
+
+        <br/>
+        <br/>
+        <br/>
+        <button onClick={() => dispatch({type:ACTIONS.CHANGE_COUNTER,payload:{value: 5}})} >+5</button>
+        <br/>
+        <br/>
+        <br/>
+        <button onClick={() => dispatch({type:ACTIONS.RESET})} >reset</button>
+        </>
+    )
+}
+```
+
++ fetch api using reducer
+
+```jsx
+import { useEffect, useReducer } from "react";
+import { useState } from "react";
+
+const ACTIONS = {
+   FETCH_START:"FETCH_START",
+   FETCH_SUCCESS:"FETCH_SUCCESS",
+   FETCH_ERROR:"FETCH_ERROR"
+}
+
+function reducer(state,action){
+
+  switch (action.type) {
+    case ACTIONS.FETCH_START:
+      return {
+           
+              isLoading:true,
+              isError:false
+             }
+    case ACTIONS.FETCH_SUCCESS:
+      return{
+             data:action.payload.data,
+             isLoading:false,
+             isError:false
+            }
+    case ACTIONS.FETCH_ERROR:
+      return{
+            
+             isError:true,
+             isLoading:false
+            }         
+    default:
+      break;
+  }
+
+}
+export function useFetchUsingReducer(url,options={}) {
+
+    // const[data,setData] = useState([]);
+    // const[isLoading,setIsLoading] = useState(true);
+    // const[isError,setIsError] = useState(false); 
+
+    const[state,dispatch] = useReducer(reducer,{isLoading:false,isError:false})
+
+    useEffect(() =>{
+
+      dispatch({type:ACTIONS.FETCH_START})
+      // setData([]);
+      // setIsError(false);
+      // setIsLoading(true);
+
+      const controller = new AbortController();
+      fetch(url,{signal:controller.signal},options).then(res =>{
+        if(res.status === 200){
+          return res.json()
+        }else{
+         Promise.reject(res);
+        }
+      }).then((data) => dispatch({type:ACTIONS.FETCH_SUCCESS,payload:{data:data}}))
+      .catch((e) => {
+        if(e?.name === "AbortError") return;
+        dispatch({type:ACTIONS.FETCH_ERROR})})
+      
+      return(() =>{
+        controller.abort();
+      })
+  } ,[url])
+
+  return {...state}
+  }
+```

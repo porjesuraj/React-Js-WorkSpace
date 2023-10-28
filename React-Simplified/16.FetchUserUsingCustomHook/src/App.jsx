@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { useEffect } from 'react'
 import { useFetch } from './useFetch'
+import { useFetchUsingReducer } from './useFetchUsingReducer'
 
 // If the API does not work use these local URLs
 // const URLS = {
@@ -30,7 +31,8 @@ const URLS = {
 function App() {
   const [url, setUrl] = useState(URLS.USERS)
 
-  const {data, isLoading, isError} = useFetch(url,OPTIONS)
+  //const {data, isLoading, isError} = useFetch(url,OPTIONS)
+  const {data, isLoading, isError} = useFetchUsingReducer(url,OPTIONS)
   // BONUS:
   // const { data, isLoading, isError } = useFetch(url, OPTIONS)
 
