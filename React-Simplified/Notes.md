@@ -2346,3 +2346,194 @@ export function useFetchUsingReducer(url,options={}) {
   return {...state}
   }
 ```
+
+## UseContext hook 
++ it is used to pass data similar to props, but more universally throughout the component, if something is global for the app, and passing props in each component, is not efficent
++ the App class defines the context and pass values, to be passed to child component
+```jsx
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import { useEffect } from 'react';
+import { Child } from './Child';
+import { createContext } from 'react';
+
+
+export const ThemeContext = createContext();
+function App() {
+
+const[isDarkmode,setIsDarkMode] = useState(false);
+
+useEffect(() =>{
+  document.body.style.background = isDarkmode?"#333":"white";
+  document.body.style.color = isDarkmode?"white":"#333";
+
+})
+function toggle(){
+
+  setIsDarkMode(current => !current);
+}
+
+
+  return (
+   <ThemeContext.Provider value={{isDarkmode,toggle}}>
+ <Child/>
+ {/* <Child isDarkmode={isDarkmode} toggle={toggle}/> */}
+  <p>
+  No internet
+Try:
+
+Checking the network cables, modem, and router
+Reconnecting to Wi-Fi
+Running Windows Network Diagnostics
+ERR_INTERNET_DISCONNECTED
+
+  </p>
+
+   </ThemeContext.Provider>
+  )
+}
+
+export default App
+
+```
++ child and grandchild component consuming the context values
+
+```jsx
+export function Child(){
+    return (
+        <GrandChild />
+        // <GrandChild isDarkmode={isDarkmode} toggle={toggle} />
+    )
+}
+
+import { useContext } from "react"
+import { ThemeContext } from "./App"
+export function GrandChild(){
+
+    const{isDarkmode,toggle} = useContext(ThemeContext)
+    return(<>
+      <button
+   style={{
+    backgroud: isDarkmode ?"White":"#333",
+    color:isDarkmode?"#333": "White",
+    border:"none",
+    padding:".5em",
+    borderRadius:".25em",
+    cursor:"pointer",
+   }}
+   onClick={toggle}> Toggle Theme</button>
+    </>)
+}
+```
++ in case of class component the child component need to add consumer tag and 
++ the method that comes with it get the data
+
+```jsx
+import React from "react"
+import { ThemeContext } from "./App"
+
+export class GrandChildClass extends React.Component{
+
+  render(){
+
+    return(<ThemeContext.Consumer>
+      {
+        ({isDarkmode,toggle}) =>(
+          <button
+   style={{
+    backgroud: isDarkmode ?"White":"#333",
+    color:isDarkmode?"#333": "White",
+    border:"none",
+    padding:".5em",
+    borderRadius:".25em",
+    cursor:"pointer",
+   }}
+   onClick={toggle}> Toggle Theme</button>
+   )
+      }
+      
+    </ThemeContext.Consumer>)
+  }
+    
+}
+```
+## Store state as locally as possible 
++ use the component if no need to access the state in other component
++ use APP if state is shared in different component
+
+
+## Handle Derived state
+
++ in case we has a list and we want to use the list filtered and show that in ui, So instead of creating two states, we can just update filter list on page re render, and useMemo, so it only changes if list or input changes
+
++ in case we want from a list of user a selected user, instead of creating two state object, we can use the user id as state object, and search from list to get user each time.
+
+```jsx
+import { useState,useMemo } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+
+function App() {
+  const[items,setItems] = useState([1,2,3,4]);
+ const [inputValue, setInputValue] = useState("");
+ 
+ const filteredList = useMemo(() =>{
+ return inputValue === "" ? items: items.filter(i => i < inputValue);
+ },[items,inputValue])
+  
+  return (
+ 
+    <>
+    <label htmlFor='input'>Input</label>
+    <input  id="input" type='number' value={inputValue} onChange={e => setInputValue(e.target.valueAsNumber)}/>
+
+    <div >
+      {filteredList.join(",")}
+    </div>
+    <br/>
+    <br/>
+   
+   <button onClick={() => setItems(i => [...i,2.5])} >Add 2.5</button>
+    </>
+  )
+}
+
+export default App
+
+```
+## Environmental variable in React
+
++ for storing and using environmental variable
++ we need to create .env file in the root of the application
++ we can create separate env for dev and production by 
+adding env.production.local and env.development.local to the file name
++ for react app created by vite, we can make env variable public by adding
+VITE_variableName = value 
+```
+// can be exposed to user
+VITE_URL=dev.com
+// private
+PASSWORD=password123
+```
++ to use env variable in application, syntax is
+```jsx
+// can be viewed in UI
+ <div> {import.meta.env.VITE_URL}
+ 
+ // cannot be viewed
+   {import.meta.env.PASSWORD}</div>
+```
+
++ for react app created with vite, we use 
+REACT_APP_variableName = value 
+for storing public env
+
+
+
+
+
+
+
