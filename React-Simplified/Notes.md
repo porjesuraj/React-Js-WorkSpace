@@ -2532,8 +2532,228 @@ REACT_APP_variableName = value
 for storing public env
 
 
+## Routing in react 
+
++ without using any library, we can use a switch statement to set the component, based on url 
+
+```jsx
+
+import './App.css'
+import { Navbar } from './Navbar';
+import { Contact } from './pages/Contact';
+import { Home } from './pages/Home';
+import { Store } from './pages/Store';
 
 
+function App() {
+  let component;
 
+  switch(location.pathname){
 
+    case "/":
+      component =  <Home/>;
+      break;
+    case "/store":
+      component = <Store/>
+      break;
 
+    case "/contact":
+      component = <Contact/>  
+      break;
+    default:
+      null;
+      
+
+  }
+  return (
+    <>
+        <nav>
+    <ul>
+      <li>
+        <a href='/'>Home</a>
+      </li>
+      <li>
+        <a href="/contact">Contact</a>
+      </li>
+      <li>
+        <a href='/store'>Store</a>
+      </li>
+    </ul>
+   </nav>
+    {component}
+    </>
+  )
+}
+
+export default App
+
+```
+
++ Routing using library
++ we can use following command to install react router library
+```
+npm i react-router-dom
+```
++ this library provides an object that handles the routes
+1. first step is to create the router object
+
+```jsx
+import { Route, createBrowserRouter, createHashRouter, createMemoryRouter, createRoutesFromElements } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { Store } from "./pages/Store";
+import { Contact } from "./pages/Contact";
+
+export const router1 = createBrowserRouter([
+    {path:"/",element:<Home/>},
+    {path:"/store",element:<Store/>},
+    {path:"/contact",element:<Contact/>}
+])
+
+export const router = createBrowserRouter(
+    createRoutesFromElements(
+    <>
+    <Route path="/" element={<Home/>} />
+    <Route path="/store" element={<Store/>} />
+    <Route path="/contact" element={<Contact/>} />
+    </>
+    )
+)
+// use when not need to change page, change # part of url
+//export const router = createHashRouter([])
+
+//use for testing,as stores everything in memory of page, page url does'nt change
+//export const router = createMemoryRouter([])
+```
+
+2. now we need to register the router in main.jsx
+
+```jsx
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <RouterProvider router={router}/>
+  </React.StrictMode>,
+```
+3. we can modify our anchor tag, so only component refreshes and avoid page load
+
+```jsx
+import { Link } from "react-router-dom";
+
+export function Navbar(){
+
+    return(
+        <>
+         <nav>
+    <ul>
+      <li>
+        <Link to='/'>Home</Link>
+      </li>
+      <li>
+        <Link to="/contact">Contact</Link>
+      </li>
+      <li>
+        <Link to='/store'>Store</Link>
+      </li>
+    </ul>
+   </nav>
+        </>
+    )
+}
+```
+
+### Nesting Routes 
++ we can create nested route using the children property of router.
+```jsx
+import { Outlet, Route, createBrowserRouter, createHashRouter, createMemoryRouter, createRoutesFromElements } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { Store } from "./pages/Store";
+import { Contact } from "./pages/Contact";
+import { Navbar } from "./Navbar";
+import { Team } from "./pages/Team";
+import { TeamMember } from "./pages/TeamMember";
+import { TeamNavbar } from "./TeamNavBar";
+import './style.css'
+/*
+export const router1 = createBrowserRouter([
+    {path:"/",element:<Home/>},
+    {path:"/store",element:<Store/>},
+    {path:"/contact",element:<Contact/>}
+])
+*/
+export const router = createBrowserRouter([
+    {element:<NavLayout/>,
+     errorElement:<h1>Error</h1>,
+    children:[
+
+    {path:"/",element:<Home/>},
+    {path:"/store",element:<Store/>, errorElement:<h1>Error</h1>},
+    {path:"/contact",element:<Contact/>},
+    {path:"/team",element:<TeamNavLayout/>,
+     children:[
+        {index:true,element:<Team/>},
+        {path:"jay",element:<TeamMember name="jay"/>},
+        {path:"ray",element:<TeamMember name="ray"/>}
+    ]}
+   
+    ]}
+    
+])
+
+function NavLayout(){
+
+    return(
+        <>
+       <Navbar/>
+       <Outlet/>
+        </>
+    )
+}
+
+function TeamNavLayout(){
+    return(
+        <>
+        <TeamNavbar/>
+        <Outlet context="@Team Context"/>
+        </>
+    )
+}
+```
++ we can create NavBar to demonstrate different 
+```jsx
+import { NavLink } from "react-router-dom";
+
+export function Navbar(){
+
+    return(
+        <>
+         <nav>
+    <ul>
+      <li>
+        <NavLink to='/'>Home</NavLink>
+      </li>
+      <li>
+        <NavLink to="/contact">Contact</NavLink>
+      </li>
+      <li>
+        <NavLink to='/store'>Store</NavLink>
+      </li>
+      <li>
+        <NavLink to='/team'>Team</NavLink>
+      </li>
+      <li>
+        <NavLink to='..'>.. Default relative to Route</NavLink>
+      </li>
+      <li>
+        <NavLink to='..' relative="path">.. relative to Path</NavLink>
+      </li>
+      <li>
+        <NavLink to='.'>. Default relative to Route</NavLink>
+      </li>
+      <li>
+        <NavLink to='.' relative="path">. relative to Path</NavLink>
+      </li>
+    </ul>
+   </nav>
+        </>
+    )
+}
+```
